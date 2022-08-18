@@ -97,6 +97,7 @@ Partial Class Form1
         Me.RadioButton1.TabIndex = 6
         Me.RadioButton1.TabStop = True
         Me.RadioButton1.Text = "Inside Plates"
+        Me.RadioButton1.Checked = True
         Me.RadioButton1.UseVisualStyleBackColor = True
         '
         'RadioButton2
