@@ -182,6 +182,7 @@ Public Class Form1
             Loop Until MsgBox(prompt.ToString(), vbYesNo).Equals(MsgBoxResult.No)
         End If
 
+        ' Test to show contents
         prompt.Clear()
         With prompt
             .Append(JobNumber).AppendLine()
