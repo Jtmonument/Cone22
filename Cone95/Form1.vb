@@ -12,10 +12,10 @@ Public Class Form1
         ' Assign variables
 
         Dim Seg As Integer
-        Dim W As Double
-        Dim TL As Double
-        Dim W1 As Double
-        Dim L1 As Double
+        Dim TotalWidth As Double
+        Dim TotalLength As Double
+        Dim SegmentWidth As Double
+        Dim SegmentLength As Double
 
         Dim Q As Double
         Dim B As Double
@@ -39,7 +39,7 @@ Public Class Form1
         PieceName = TextBox2.Text
         PlateType = If(RadioButton1.Checked, Plate.INNER, Plate.OUTER)
 
-        ' Validate Radius value
+        ' Validate Radius values
         If OuterRadius <= 0 Then
             MsgBox("The outer radius must be greater than zero.", vbOKOnly, NoTitle)
             Return
@@ -72,33 +72,29 @@ Public Class Form1
         OutsideRadius = OUR / Cos(Theta)
         InsideRadius = IR / Cos(Theta)
         PIE = 3.1416 ' Can I use PI from Math namespace?
-        Deg = 2 * PI * Cos(Theta)
-        Degree = (Deg * 180) / PIE
+        Deg = 2 * PIE * Cos(Theta)
+        Degree = FormatNumber((Deg * 180) / PIE, 4)
 
         ' Line 540
         If Deg > 0 AndAlso Deg <= PIE / 2 Then 'goto 1290
             C = PIE / 2 - Deg
+            SecondCutOffRadius = 2 * OutsideRadius * Sin(C / 2)
             FirstCutOffRadius = 2 * OutsideRadius * Sin(Deg / 2)
-            L1 = FirstCutOffRadius + 1
+            SegmentLength = FirstCutOffRadius + 1
             B = (Sin(Deg / 4)) ^ 2 * InsideRadius * 2
-            W1 = (OutsideRadius - InsideRadius) + B + 1
-            OutsideRadius = Int(OutsideRadius * 16 + 0.5) / 16
-            InsideRadius = Int(InsideRadius * 16 + 0.5) / 16
-            Difference = OutsideRadius - InsideRadius
-            FirstCutOffRadius = Int(FirstCutOffRadius * 16 + 0.5) / 16
-            SecondCutOffRadius = Int(SecondCutOffRadius * 16 + 0.5) / 16
+            SegmentWidth = (OutsideRadius - InsideRadius) + B + 1
         ElseIf Deg > PIE / 2 AndAlso Deg <= PIE Then ' goto 1360
-            C = PI - Deg
-            L1 = Sin(Deg / 2) * OutsideRadius * 2 + 1
-            W1 = (Sin(Deg / 4)) ^ 2 * InsideRadius * 2 + (OutsideRadius - InsideRadius) + 1
+            C = PIE - Deg
+            SegmentLength = Sin(Deg / 2) * OutsideRadius * 2 + 1
+            SegmentWidth = (Sin(Deg / 4)) ^ 2 * InsideRadius * 2 + (OutsideRadius - InsideRadius) + 1
         ElseIf Deg > PIE AndAlso Deg <= 3 * PIE / 2 Then ' goto 1400
-            C = 3 * PI / 2 - Deg
-            L1 = OutsideRadius * 2 + 1
-            W1 = Sin(Deg - PI) * OutsideRadius + OutsideRadius + 1
+            C = 3 * PIE / 2 - Deg
+            SegmentLength = OutsideRadius * 2 + 1
+            SegmentWidth = Sin(Deg - PIE) * OutsideRadius + OutsideRadius + 1
         ElseIf Deg > 3 * PIE / 2 AndAlso Deg <= 2 * PIE Then ' goto 1440
-            C = 2 * PI - Deg
-            L1 = OutsideRadius * 2 + 1
-            W1 = L1
+            C = 2 * PIE - Deg
+            SegmentLength = OutsideRadius * 2 + 1
+            SegmentWidth = SegmentLength
         End If
 
         ' goto 1490
@@ -149,16 +145,16 @@ Public Class Form1
                 V1 = (OutsideRadius ^ 2 - (C1 / 2) ^ 2) ^ 0.5
                 V2 = (InsideRadius ^ 2 - (C1 / 2) ^ 2) ^ 0.5
                 V3 = V1 - V2 + 0.5
-                TL = (Seg - 1) * V3 + Z + Difference + 1
-                W = Sin(Degr / 2) * OutsideRadius * 2 + 1
+                TotalLength = (Seg - 1) * V3 + Z + Difference + 1
+                TotalWidth = Sin(Degr / 2) * OutsideRadius * 2 + 1
                 prompt.Clear()
                 With prompt
                     .Append($"Number of segments = {Seg}").AppendLine()
-                    .Append($"\tTotal Width = {W}").AppendLine()
-                    .Append($"\tTotal Length = {TL}").AppendLine()
+                    .Append($"\tTotal Width = {TotalWidth}").AppendLine()
+                    .Append($"\tTotal Length = {TotalLength}").AppendLine()
                     .Append($"Segment dimensions:").AppendLine()
-                    .Append($"\tTotal Width = {W1}").AppendLine()
-                    .Append($"\tTotal Length = {L1}").AppendLine()
+                    .Append($"\tTotal Width = {SegmentWidth}").AppendLine()
+                    .Append($"\tTotal Length = {SegmentLength}").AppendLine()
                     .Append("Do you want to change the number of segments?")
                 End With
             Loop Until MsgBox(prompt.ToString(), vbYesNo, NoTitle).Equals(MsgBoxResult.No)
@@ -181,6 +177,10 @@ Public Class Form1
             .Append(Degree).AppendLine()
             .Append(FirstCutOffRadius).AppendLine()
             .Append(SecondCutOffRadius).AppendLine()
+            .Append(TotalWidth).AppendLine()
+            .Append(TotalLength).AppendLine()
+            .Append(SegmentWidth).AppendLine()
+            .Append(SegmentLength).AppendLine()
         End With
         MsgBox(prompt.ToString(), vbOKOnly, NoTitle)
 
