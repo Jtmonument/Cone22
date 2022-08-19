@@ -2,25 +2,6 @@
 Imports System.Text
 
 Public Class Form1
-    Public JobNumber As String
-    Public PieceName As String
-    Public OuterRadius As Double
-    Public InnerRadius As Double
-    Public ConeHeight As Double
-    Public PlateThickness As Double
-    Public PlateType As Plate
-
-    Dim OutsideRadius As Double
-    Dim InsideRadius As Double
-    Dim Difference As Double
-    Dim Degree As Double
-    Dim FirstCutOffRadius As Double
-    Dim SecondCutOffRadius As Double
-
-    Public Enum Plate
-        INNER
-        OUTER
-    End Enum
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
@@ -39,7 +20,6 @@ Public Class Form1
         Dim Q As Double
         Dim B As Double
         Dim C As Double
-        Dim D As Double
         Dim X As Double
         Dim Theta As Double
         Dim Y As Double
@@ -53,22 +33,24 @@ Public Class Form1
         Dim V1 As Double
         Dim V2 As Double
         Dim V3 As Double
+        Dim NoTitle = ""
 
         JobNumber = TextBox1.Text
         PieceName = TextBox2.Text
-        ' TODO Validate Double value onchange
-        OuterRadius = TextBox3.Text
-        InnerRadius = TextBox4.Text
-        ConeHeight = TextBox5.Text
-        PlateThickness = TextBox6.Text
         PlateType = If(RadioButton1.Checked, Plate.INNER, Plate.OUTER)
 
         ' Validate Radius value
         If OuterRadius <= 0 Then
-            MsgBox("The outer radius must be greater than zero.", vbOKOnly)
+            MsgBox("The outer radius must be greater than zero.", vbOKOnly, NoTitle)
             Return
-        ElseIf InsideRadius >= OuterRadius Then
-            MsgBox("The inner radius must be less than outer radius.", vbOKOnly)
+        ElseIf InnerRadius >= OuterRadius Then
+            MsgBox("The inner radius must be less than outer radius.", vbOKOnly, NoTitle)
+            Return
+        ElseIf String.IsNullOrWhiteSpace(JobNumber) Then
+            MsgBox("Job Number must not be empty.", vbOKOnly, NoTitle)
+            Return
+        ElseIf String.IsNullOrWhiteSpace(PieceName) Then
+            MsgBox("Piece Name must not be empty.", vbOKOnly, NoTitle)
             Return
         End If
 
@@ -154,7 +136,7 @@ Public Class Form1
 
         ' Prompt for figuring in segments
         ' If in segments goto 1720 else goto 2000
-        If MsgBox(prompt.ToString(), vbYesNo).Equals(MsgBoxResult.Yes) Then
+        If MsgBox(prompt.ToString(), vbYesNo, NoTitle).Equals(MsgBoxResult.Yes) Then
             Do
                 ' Get number of segments
                 Dim SegmentForm As New SegmentsForm
@@ -179,7 +161,7 @@ Public Class Form1
                     .Append($"\tTotal Length = {L1}").AppendLine()
                     .Append("Do you want to change the number of segments?")
                 End With
-            Loop Until MsgBox(prompt.ToString(), vbYesNo).Equals(MsgBoxResult.No)
+            Loop Until MsgBox(prompt.ToString(), vbYesNo, NoTitle).Equals(MsgBoxResult.No)
         End If
 
         ' Test to show contents
@@ -200,8 +182,56 @@ Public Class Form1
             .Append(FirstCutOffRadius).AppendLine()
             .Append(SecondCutOffRadius).AppendLine()
         End With
-        MsgBox(prompt.ToString())
+        MsgBox(prompt.ToString(), vbOKOnly, NoTitle)
 
     End Sub
 
+    Private Sub TextBox_TextChanged(sender As Object, e As EventArgs) Handles TextBox3.TextChanged, TextBox4.TextChanged, TextBox5.TextChanged, TextBox6.TextChanged
+        Select Case sender.GetHashCode()
+            Case TextBox3.GetHashCode()
+                CorrectText(TextBox3, OuterRadius)
+            Case TextBox4.GetHashCode()
+                CorrectText(TextBox4, InnerRadius)
+            Case TextBox5.GetHashCode()
+                CorrectText(TextBox5, ConeHeight)
+            Case TextBox6.GetHashCode()
+                CorrectText(TextBox6, PlateThickness)
+        End Select
+    End Sub
+
+    Private Sub CorrectText(ByRef sender As TextBox, ByRef var As Double)
+        Dim input = sender.Text
+        Dim temp As Double = 0
+        If Double.TryParse(input, temp) Then
+            sender.Text &= " in."
+        ElseIf input.EndsWith("in.") AndAlso Double.TryParse(input.Substring(0, input.IndexOf("in.")), temp) Then
+            var = temp
+            sender.Text = var & " in."
+        Else
+            sender.Text = var & " in."
+        End If
+        sender.SelectionStart = sender.Text.Length - 4
+    End Sub
+    Private Sub Form_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBox1.KeyPress, TextBox2.KeyPress, TextBox3.KeyPress, TextBox4.KeyPress, TextBox5.KeyPress, TextBox6.KeyPress
+        If Char.IsWhiteSpace(e.KeyChar) Then
+            Me.Button1_Click(sender, e)
+        End If
+    End Sub
+
+    Private Sub TextBox_MouseClick(sender As Object, e As MouseEventArgs) Handles TextBox1.MouseClick, TextBox2.MouseClick, TextBox3.MouseClick, TextBox4.MouseClick, TextBox5.MouseClick, TextBox6.MouseClick
+        Select Case sender.GetHashCode()
+            Case TextBox1.GetHashCode()
+                TextBox1.SelectAll()
+            Case TextBox2.GetHashCode()
+                TextBox2.SelectAll()
+            Case TextBox3.GetHashCode()
+                TextBox3.SelectAll()
+            Case TextBox4.GetHashCode()
+                TextBox4.SelectAll()
+            Case TextBox5.GetHashCode()
+                TextBox5.SelectAll()
+            Case TextBox6.GetHashCode()
+                TextBox6.SelectAll()
+        End Select
+    End Sub
 End Class

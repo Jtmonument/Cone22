@@ -41,55 +41,74 @@ Partial Class Form1
         '
         'TextBox1
         '
+        Me.TextBox1.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
         Me.TextBox1.Location = New System.Drawing.Point(197, 12)
         Me.TextBox1.MinimumSize = New System.Drawing.Size(0, 28)
         Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(173, 28)
+        Me.TextBox1.PlaceholderText = "Enter Job Number"
+        Me.TextBox1.Size = New System.Drawing.Size(173, 29)
         Me.TextBox1.TabIndex = 0
+        Me.TextBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'TextBox2
         '
+        Me.TextBox2.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
         Me.TextBox2.Location = New System.Drawing.Point(197, 46)
         Me.TextBox2.MinimumSize = New System.Drawing.Size(0, 28)
         Me.TextBox2.Name = "TextBox2"
-        Me.TextBox2.Size = New System.Drawing.Size(173, 28)
+        Me.TextBox2.PlaceholderText = "Enter Piece Name"
+        Me.TextBox2.Size = New System.Drawing.Size(173, 29)
         Me.TextBox2.TabIndex = 1
+        Me.TextBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'TextBox3
         '
+        Me.TextBox3.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
         Me.TextBox3.Location = New System.Drawing.Point(197, 80)
         Me.TextBox3.MinimumSize = New System.Drawing.Size(0, 28)
         Me.TextBox3.Name = "TextBox3"
-        Me.TextBox3.Size = New System.Drawing.Size(173, 28)
+        Me.TextBox3.Size = New System.Drawing.Size(173, 29)
         Me.TextBox3.TabIndex = 2
+        Me.TextBox3.Text = "0 in."
+        Me.TextBox3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'TextBox4
         '
+        Me.TextBox4.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
         Me.TextBox4.Location = New System.Drawing.Point(197, 114)
         Me.TextBox4.MinimumSize = New System.Drawing.Size(0, 28)
         Me.TextBox4.Name = "TextBox4"
-        Me.TextBox4.Size = New System.Drawing.Size(173, 28)
+        Me.TextBox4.Size = New System.Drawing.Size(173, 29)
         Me.TextBox4.TabIndex = 3
+        Me.TextBox4.Text = "0 in."
+        Me.TextBox4.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'TextBox5
         '
+        Me.TextBox5.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
         Me.TextBox5.Location = New System.Drawing.Point(197, 148)
         Me.TextBox5.MinimumSize = New System.Drawing.Size(0, 28)
         Me.TextBox5.Name = "TextBox5"
-        Me.TextBox5.Size = New System.Drawing.Size(173, 28)
+        Me.TextBox5.Size = New System.Drawing.Size(173, 29)
         Me.TextBox5.TabIndex = 4
+        Me.TextBox5.Text = "0 in."
+        Me.TextBox5.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'TextBox6
         '
+        Me.TextBox6.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
         Me.TextBox6.Location = New System.Drawing.Point(197, 182)
         Me.TextBox6.MinimumSize = New System.Drawing.Size(0, 28)
         Me.TextBox6.Name = "TextBox6"
-        Me.TextBox6.Size = New System.Drawing.Size(173, 28)
+        Me.TextBox6.Size = New System.Drawing.Size(173, 29)
         Me.TextBox6.TabIndex = 5
+        Me.TextBox6.Text = "0 in."
+        Me.TextBox6.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'RadioButton1
         '
         Me.RadioButton1.AutoSize = True
+        Me.RadioButton1.Checked = True
         Me.RadioButton1.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
         Me.RadioButton1.Location = New System.Drawing.Point(27, 226)
         Me.RadioButton1.Name = "RadioButton1"
@@ -97,7 +116,6 @@ Partial Class Form1
         Me.RadioButton1.TabIndex = 6
         Me.RadioButton1.TabStop = True
         Me.RadioButton1.Text = "Inside Plates"
-        Me.RadioButton1.Checked = True
         Me.RadioButton1.UseVisualStyleBackColor = True
         '
         'RadioButton2
@@ -225,4 +243,23 @@ Partial Class Form1
     Friend WithEvents Label4 As Label
     Friend WithEvents Label5 As Label
     Friend WithEvents Label6 As Label
+    Friend JobNumber As String
+    Friend PieceName As String
+    Friend OuterRadius As Double = 0
+    Friend InnerRadius As Double = 0
+    Friend ConeHeight As Double = 0
+    Friend PlateThickness As Double = 0
+    Friend PlateType As Plate
+
+    Friend OutsideRadius As Double
+    Friend InsideRadius As Double
+    Friend Difference As Double
+    Friend Degree As Double
+    Friend FirstCutOffRadius As Double
+    Friend SecondCutOffRadius As Double
+
+    Friend Enum Plate
+        INNER
+        OUTER
+    End Enum
 End Class
