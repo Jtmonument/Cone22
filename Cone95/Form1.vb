@@ -147,6 +147,13 @@ Public Class Form1
                 V3 = V1 - V2 + 0.5
                 TotalLength = (Seg - 1) * V3 + Z + Difference + 1
                 TotalWidth = Sin(Degr / 2) * OutsideRadius * 2 + 1
+
+                ' Round
+                TotalWidth = FormatNumber(TotalWidth, 4)
+                TotalLength = FormatNumber(TotalLength, 4)
+                SegmentWidth = FormatNumber(SegmentWidth, 4)
+                SegmentLength = FormatNumber(SegmentLength, 4)
+
                 prompt.Clear()
                 With prompt
                     .Append($"Number of segments = {Seg}").AppendLine()
@@ -163,8 +170,9 @@ Public Class Form1
         ' Test to show contents
         prompt.Clear()
         With prompt
-            .Append(JobNumber).Append(" "c)
             .Append(PieceName).Append(" "c)
+            .Append(JobNumber).Append(" "c)
+            .Append(If(PlateType = Plate.INNER, "Inner Plates", "Outer Plates")).Append(" "c)
             .Append(OuterRadius).Append(" "c)
             .Append(InnerRadius).Append(" "c)
             .Append(ConeHeight).Append(" "c)
@@ -175,15 +183,16 @@ Public Class Form1
             .Append(Degree).Append(" "c)
             .Append(FirstCutOffRadius).Append(" "c)
             .Append(SecondCutOffRadius).Append(" "c)
+            .Append(Seg).Append(" "c)
             .Append(TotalWidth).Append(" "c)
             .Append(TotalLength).Append(" "c)
             .Append(SegmentWidth).Append(" "c)
             .Append(SegmentLength)
         End With
         Dim script = New ProcessStartInfo
-        script.FileName = "create_pdf.exe"
+        script.FileName = "create_pdf"
         script.Arguments = prompt.ToString()
-        script.CreateNoWindow = False
+        script.CreateNoWindow = True
         Process.Start(script)
         MsgBox(prompt.ToString(), vbOKOnly, NoTitle)
 

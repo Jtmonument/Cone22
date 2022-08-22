@@ -5,6 +5,8 @@
 
 # Manually Added
 *.pdf
+*.spec
+build/
 
 # User-specific files
 *.rsuser

@@ -1,6 +1,4 @@
 import subprocess, sys
-from tabnanny import check
-from typing import Dict
 from fpdf import FPDF
 
 
@@ -10,32 +8,34 @@ def get_args():
         global piece_name
         piece_name = sys.argv[1]
         global job_number
-        job_number = "Job Number" + sys.argv[2]
+        job_number = "Job Number: " + sys.argv[2]
         global inputs
         inputs = {
-            "Type": sys.argv[3],
-            "Outer Radius": sys.argv[4],
-            "Inner Radius": sys.argv[5],
-            "Height": sys.argv[6]
+            "Type": "Inner Plates" if int(sys.argv[3]) == 0 else "Outer Plates",
+            "Outer Radius": sys.argv[4] + " in.",
+            "Inner Radius": sys.argv[5] + " in.",
+            "Height": sys.argv[6] + " in.",
+            "Plate Thickness": sys.argv[7] + " in.",
         }
 
         # Outputs
         global outputs
         outputs = {
-            "Outside Radius": sys.argv[7],
-            "Inside Radius": sys.argv[8],
-            "Difference": sys.argv[9],
-            "First Cut-Off Radius": sys.argv[10],
-            "Second Cut-Off Radius": sys.argv[11],
+            "Outside Radius": sys.argv[8] + " in.",
+            "Inside Radius": sys.argv[9] + " in.",
+            "Difference": sys.argv[10] + " in.",
+            "Degrees": sys.argv[11],
+            "First Cut-Off Radius": sys.argv[12] + " in.",
+            "Second Cut-Off Radius": sys.argv[13] + " in."
         }
         global plate_size
         plate_size = {
-            "Number of Segments": sys.argv[12],
-            "Total Width": sys.argv[13],
-            "Total Length": sys.argv[14]
+            "Number of Segments": sys.argv[14],
+            "Total Width": sys.argv[15] + " in.",
+            "Total Length": sys.argv[16] + " in."
         }
-        if int(sys.argv[12]) > 1:
-            plate_size.update({"Width of one segment": sys.argv[15], "Length of one segment": sys.argv[16]})
+        if int(sys.argv[14]) > 1:
+            plate_size.update({"Width of one segment": sys.argv[17] + " in.", "Length of one segment": sys.argv[18] + " in."})
     except:
         print("Insufficient arguments")
 
@@ -48,11 +48,11 @@ def main():
     pdf.add_page()
     pdf.image("processbarron_logo_dark.png", 5, 280, 85, 15)
     pdf.set_font("Helvetica", size=15)
-    pdf.cell(190, 1, txt="Cone Development", ln=1, align="R")
+    pdf.cell(180, 1, txt="Cone Development", ln=1, align="R")
+    pdf.cell(180, 10, txt=job_number, ln=2, align="R")
     pdf.set_font("Helvetica", size=25)
-    pdf.cell(200, 10, txt=piece_name, ln=2, align="L")
+    pdf.cell(200, 10, txt=piece_name, ln=3, align="L")
     pdf.set_font("Helvetica", size=15)
-    pdf.cell(200, 10, txt=job_number, ln=3, align="L")
     pdf.cell(200, 10, ln=4)
 
     # Inputs
