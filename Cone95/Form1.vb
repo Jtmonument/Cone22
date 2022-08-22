@@ -172,7 +172,7 @@ Public Class Form1
         With prompt
             .Append(PieceName).Append(" "c)
             .Append(JobNumber).Append(" "c)
-            .Append(If(PlateType = Plate.INNER, "Inner Plates", "Outer Plates")).Append(" "c)
+            .Append(PlateType).Append(" "c)
             .Append(OuterRadius).Append(" "c)
             .Append(InnerRadius).Append(" "c)
             .Append(ConeHeight).Append(" "c)
@@ -194,7 +194,6 @@ Public Class Form1
         script.Arguments = prompt.ToString()
         script.CreateNoWindow = True
         Process.Start(script)
-        MsgBox(prompt.ToString(), vbOKOnly, NoTitle)
 
     End Sub
 
