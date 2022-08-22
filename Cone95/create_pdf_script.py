@@ -1,31 +1,97 @@
-import subprocess
+import subprocess, sys
+from tabnanny import check
+from typing import Dict
 from fpdf import FPDF
 
-job_number = ""
-piece_name = "Piece Name"
-outer_radius = ""
-inner_radius = ""
-height = ""
-plate_thickness = ""
-plate_location = ""
-outside_radius = ""
-inside_radius = ""
-difference = ""
-first_cutoff_radius = ""
-second_cutoff_radius = ""
 
-# plate size info
-number_of_segments = ""
-total_width = ""
-total_length = ""
-# only if number_of_segments greater than two
-segment_width = ""
-segment_length = ""
+def get_args():
+    try:
+        # Inputs
+        global piece_name
+        piece_name = sys.argv[1]
+        global job_number
+        job_number = "Job Number" + sys.argv[2]
+        global inputs
+        inputs = {
+            "Type": sys.argv[3],
+            "Outer Radius": sys.argv[4],
+            "Inner Radius": sys.argv[5],
+            "Height": sys.argv[6]
+        }
 
-pdf = FPDF()
-pdf.add_page()
-pdf.image("processbarron_logo_dark.png", 5, 280, 85, 15)
-pdf.set_font("Helvetica", size=25)
-pdf.cell(200, 10, txt=piece_name, ln=1, align="C")
-pdf.output("python.pdf")
-subprocess.call(['python.pdf'], shell=True)
+        # Outputs
+        global outputs
+        outputs = {
+            "Outside Radius": sys.argv[7],
+            "Inside Radius": sys.argv[8],
+            "Difference": sys.argv[9],
+            "First Cut-Off Radius": sys.argv[10],
+            "Second Cut-Off Radius": sys.argv[11],
+        }
+        global plate_size
+        plate_size = {
+            "Number of Segments": sys.argv[12],
+            "Total Width": sys.argv[13],
+            "Total Length": sys.argv[14]
+        }
+        if int(sys.argv[12]) > 1:
+            plate_size.update({"Width of one segment": sys.argv[15], "Length of one segment": sys.argv[16]})
+    except:
+        print("Insufficient arguments")
+
+
+
+def main():
+    # Setup
+    get_args()
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.image("processbarron_logo_dark.png", 5, 280, 85, 15)
+    pdf.set_font("Helvetica", size=15)
+    pdf.cell(190, 1, txt="Cone Development", ln=1, align="R")
+    pdf.set_font("Helvetica", size=25)
+    pdf.cell(200, 10, txt=piece_name, ln=2, align="L")
+    pdf.set_font("Helvetica", size=15)
+    pdf.cell(200, 10, txt=job_number, ln=3, align="L")
+    pdf.cell(200, 10, ln=4)
+
+    # Inputs
+    index = 5
+    pdf.set_font("Helvetica", style="B", size=20)
+    pdf.cell(200, 10, ln=index)
+    index += 1
+    pdf.cell(200, 10, txt="Inputs", ln=index, align="C")
+    index += 1
+    pdf.set_font("Helvetica", size=15)
+    for item in inputs:
+        pdf.cell(200, 10, txt=item + ": " + inputs.get(item), ln=index, align="L")
+        index += 1
+    
+    # Outputs
+    pdf.set_font("Helvetica", style="B", size=20)
+    pdf.cell(200, 10, ln=index)
+    index += 1
+    pdf.cell(200, 10, txt="Outputs", ln=index, align="C")
+    index += 1
+    pdf.set_font("Helvetica", size=15)
+    for item in outputs:
+        pdf.cell(200, 10, txt=item + ": " + outputs.get(item), ln=index, align="L")
+        index += 1
+    
+    # Plate Size Information
+    pdf.set_font("Helvetica", style="B", size=20)
+    pdf.cell(200, 10, ln=index)
+    index += 1
+    pdf.cell(200, 10, txt="Plate Size Information", ln=index, align="C")
+    index += 1
+    pdf.set_font("Helvetica", size=15)
+    for item in plate_size:
+        pdf.cell(200, 10, txt=item + ": " + plate_size.get(item), ln=index, align="L")
+        index += 1
+    user = str(subprocess.Popen(["echo", "%USERNAME%"], shell=True, stdout=subprocess.PIPE).communicate()[0].decode("utf-8")[:-2])
+    path = "\\\\01it01vr\\User_Folders_HQ\\" + user + "\\Downloads\\" + piece_name + ".pdf"
+    pdf.output(path)
+    subprocess.call([path], shell=True)
+
+
+main()

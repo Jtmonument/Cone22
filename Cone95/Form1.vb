@@ -163,25 +163,28 @@ Public Class Form1
         ' Test to show contents
         prompt.Clear()
         With prompt
-            .Append(JobNumber).AppendLine()
-            .Append(PieceName).AppendLine()
-            .Append("Input").AppendLine()
-            .Append(OuterRadius).AppendLine()
-            .Append(InnerRadius).AppendLine()
-            .Append(ConeHeight).AppendLine()
-            .Append(PlateThickness).AppendLine()
-            .Append("Output").AppendLine()
-            .Append(OutsideRadius).AppendLine()
-            .Append(InsideRadius).AppendLine()
-            .Append(Difference).AppendLine()
-            .Append(Degree).AppendLine()
-            .Append(FirstCutOffRadius).AppendLine()
-            .Append(SecondCutOffRadius).AppendLine()
-            .Append(TotalWidth).AppendLine()
-            .Append(TotalLength).AppendLine()
-            .Append(SegmentWidth).AppendLine()
-            .Append(SegmentLength).AppendLine()
+            .Append(JobNumber).Append(" "c)
+            .Append(PieceName).Append(" "c)
+            .Append(OuterRadius).Append(" "c)
+            .Append(InnerRadius).Append(" "c)
+            .Append(ConeHeight).Append(" "c)
+            .Append(PlateThickness).Append(" "c)
+            .Append(OutsideRadius).Append(" "c)
+            .Append(InsideRadius).Append(" "c)
+            .Append(Difference).Append(" "c)
+            .Append(Degree).Append(" "c)
+            .Append(FirstCutOffRadius).Append(" "c)
+            .Append(SecondCutOffRadius).Append(" "c)
+            .Append(TotalWidth).Append(" "c)
+            .Append(TotalLength).Append(" "c)
+            .Append(SegmentWidth).Append(" "c)
+            .Append(SegmentLength)
         End With
+        Dim script = New ProcessStartInfo
+        script.FileName = "create_pdf.exe"
+        script.Arguments = prompt.ToString()
+        script.CreateNoWindow = False
+        Process.Start(script)
         MsgBox(prompt.ToString(), vbOKOnly, NoTitle)
 
     End Sub
