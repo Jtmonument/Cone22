@@ -1,4 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
+﻿Imports System.Resources
+Imports System.IO
+Imports System.Reflection
+Imports System.Drawing.Imaging
+
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class Form1
     Inherits System.Windows.Forms.Form
 
@@ -22,6 +27,24 @@ Partial Class Form1
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        '
+        ' Install resources
+        '
+        If Not File.Exists("create_pdf.exe") Then
+            Dim exe As FileStream = File.Open("create_pdf.exe", FileMode.Create, FileAccess.Write)
+            Dim contents As Byte() = My.Resources.create_pdf
+            exe.Write(contents, 0, contents.Length)
+            exe.Close()
+        End If
+
+        If Not File.Exists("processbarron_logo_dark.png") Then
+            Dim exe As FileStream = File.Open("processbarron_logo_dark.png", FileMode.Create, FileAccess.Write)
+            Dim bit As Bitmap = My.Resources.processbarron_logo_dark
+            bit.Save(exe, ImageFormat.Png)
+            exe.Close()
+        End If
+
+
         Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.TextBox2 = New System.Windows.Forms.TextBox()
         Me.TextBox3 = New System.Windows.Forms.TextBox()
