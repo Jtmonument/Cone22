@@ -222,7 +222,7 @@ Partial Class Form1
         Me.Controls.Add(Me.TextBox1)
         Me.Name = "Form1"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Cone95"
+        Me.Text = "Cone22"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
