@@ -31,10 +31,14 @@ Partial Class Form1
         ' Install resources
         '
         If Not File.Exists("create_pdf.exe") Then
-            Dim exe As FileStream = File.Open("create_pdf.exe", FileMode.Create, FileAccess.Write)
+            Dim exe As FileStream = File.Open("create_pdf.tmp", FileMode.Create, FileAccess.Write)
             Dim contents As Byte() = My.Resources.create_pdf
             exe.Write(contents, 0, contents.Length)
             exe.Close()
+            Dim Args = "/c ren create_pdf.tmp create_pdf.exe"
+            Dim script = New ProcessStartInfo("cmd", Args)
+            script.CreateNoWindow = True
+            Process.Start(script)
         End If
 
         If Not File.Exists("processbarron_logo_dark.png") Then
