@@ -27,27 +27,6 @@ Partial Class Form1
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        '
-        ' Install resources
-        '
-        If Not File.Exists("create_pdf.exe") Then
-            Dim exe As FileStream = File.Open("create_pdf.tmp", FileMode.Create, FileAccess.Write)
-            Dim contents As Byte() = My.Resources.create_pdf
-            exe.Write(contents, 0, contents.Length)
-            exe.Close()
-            Dim Args = "/c ren create_pdf.tmp create_pdf.exe"
-            Dim script = New ProcessStartInfo("cmd", Args)
-            script.CreateNoWindow = True
-            Process.Start(script)
-        End If
-
-        If Not File.Exists("processbarron_logo_dark.png") Then
-            Dim exe As FileStream = File.Open("processbarron_logo_dark.png", FileMode.Create, FileAccess.Write)
-            Dim bit As Bitmap = My.Resources.processbarron_logo_dark
-            bit.Save(exe, ImageFormat.Png)
-            exe.Close()
-        End If
-
 
         Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.TextBox2 = New System.Windows.Forms.TextBox()

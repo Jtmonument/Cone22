@@ -1,4 +1,6 @@
-﻿Imports System.Math
+﻿Imports System.Drawing.Imaging
+Imports System.IO
+Imports System.Math
 Imports System.Text
 
 Public Class Form1
@@ -189,12 +191,36 @@ Public Class Form1
             .Append(SegmentWidth).Append(" "c)
             .Append(SegmentLength)
         End With
+        ConfirmResources()
         Dim script = New ProcessStartInfo
         script.FileName = "create_pdf"
         script.Arguments = prompt.ToString()
         script.CreateNoWindow = True
         Process.Start(script)
 
+    End Sub
+
+    Private Sub ConfirmResources()
+        '
+        ' Install resources if not in path
+        '
+        If Not File.Exists("create_pdf.exe") Then
+            Dim exe As FileStream = File.Open("create_pdf.tmp", FileMode.Create, FileAccess.Write)
+            Dim contents As Byte() = My.Resources.create_pdf
+            exe.Write(contents, 0, contents.Length)
+            exe.Close()
+            Dim Args = "/c ren create_pdf.tmp create_pdf.exe"
+            Dim script = New ProcessStartInfo("cmd", Args)
+            script.CreateNoWindow = True
+            Process.Start(script).WaitForExit()
+        End If
+
+        If Not File.Exists("processbarron_logo_dark.png") Then
+            Dim exe As FileStream = File.Open("processbarron_logo_dark.png", FileMode.Create, FileAccess.Write)
+            Dim bit As Bitmap = My.Resources.processbarron_logo_dark
+            bit.Save(exe, ImageFormat.Png)
+            exe.Close()
+        End If
     End Sub
 
     Private Sub TextBox_TextChanged(sender As Object, e As EventArgs) Handles TextBox3.TextChanged, TextBox4.TextChanged, TextBox5.TextChanged, TextBox6.TextChanged
