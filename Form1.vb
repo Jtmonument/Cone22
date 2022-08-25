@@ -237,17 +237,20 @@ Public Class Form1
     End Sub
 
     Private Sub CorrectText(ByRef sender As TextBox, ByRef var As Double)
-        Dim input = sender.Text
+        If sender.Text.Contains(Int(var) & ". in.") Then
+            Return
+        End If
+        Dim input = sender.Text.Replace(" ", "").Replace("in.", "")
         Dim temp As Double = 0
         If Double.TryParse(input, temp) Then
-            sender.Text &= " in."
-        ElseIf input.EndsWith("in.") AndAlso Double.TryParse(input.Substring(0, input.IndexOf("in.")), temp) Then
             var = temp
-            sender.Text = var & " in."
-        Else
-            sender.Text = var & " in."
+        ElseIf String.IsNullOrWhiteSpace(input) Then
+            var = 0
         End If
-        sender.SelectionStart = sender.Text.Length - 4
+        sender.Text = var & " in."
+        If sender.SelectionStart = 0 Then
+            sender.SelectionStart = 1
+        End If
     End Sub
     Private Sub Form_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBox1.KeyPress, TextBox2.KeyPress, TextBox3.KeyPress, TextBox4.KeyPress, TextBox5.KeyPress, TextBox6.KeyPress
         If Char.IsWhiteSpace(e.KeyChar) Then
