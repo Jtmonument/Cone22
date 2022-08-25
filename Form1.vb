@@ -35,6 +35,7 @@ Public Class Form1
         Dim V1 As Double
         Dim V2 As Double
         Dim V3 As Double
+
         Dim NoTitle = ""
 
         JobNumber = TextBox1.Text
@@ -224,16 +225,15 @@ Public Class Form1
     End Sub
 
     Private Sub TextBox_TextChanged(sender As Object, e As EventArgs) Handles TextBox3.TextChanged, TextBox4.TextChanged, TextBox5.TextChanged, TextBox6.TextChanged
-        Select Case sender.GetHashCode()
-            Case TextBox3.GetHashCode()
-                CorrectText(TextBox3, OuterRadius)
-            Case TextBox4.GetHashCode()
-                CorrectText(TextBox4, InnerRadius)
-            Case TextBox5.GetHashCode()
-                CorrectText(TextBox5, ConeHeight)
-            Case TextBox6.GetHashCode()
-                CorrectText(TextBox6, PlateThickness)
-        End Select
+        If sender.Equals(TextBox3) Then
+            CorrectText(TextBox3, OuterRadius)
+        ElseIf sender.Equals(TextBox4) Then
+            CorrectText(TextBox4, InnerRadius)
+        ElseIf sender.Equals(TextBox5) Then
+            CorrectText(TextBox5, ConeHeight)
+        ElseIf sender.Equals(TextBox6) Then
+            CorrectText(TextBox6, PlateThickness)
+        End If
     End Sub
 
     Private Sub CorrectText(ByRef sender As TextBox, ByRef var As Double)
@@ -251,24 +251,11 @@ Public Class Form1
     End Sub
     Private Sub Form_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBox1.KeyPress, TextBox2.KeyPress, TextBox3.KeyPress, TextBox4.KeyPress, TextBox5.KeyPress, TextBox6.KeyPress
         If Char.IsWhiteSpace(e.KeyChar) Then
-            Me.Button1_Click(sender, e)
+            Button1_Click(sender, e)
         End If
     End Sub
 
     Private Sub TextBox_MouseClick(sender As Object, e As MouseEventArgs) Handles TextBox1.MouseClick, TextBox2.MouseClick, TextBox3.MouseClick, TextBox4.MouseClick, TextBox5.MouseClick, TextBox6.MouseClick
-        Select Case sender.GetHashCode()
-            Case TextBox1.GetHashCode()
-                TextBox1.SelectAll()
-            Case TextBox2.GetHashCode()
-                TextBox2.SelectAll()
-            Case TextBox3.GetHashCode()
-                TextBox3.SelectAll()
-            Case TextBox4.GetHashCode()
-                TextBox4.SelectAll()
-            Case TextBox5.GetHashCode()
-                TextBox5.SelectAll()
-            Case TextBox6.GetHashCode()
-                TextBox6.SelectAll()
-        End Select
+        CType(sender, TextBox).SelectAll()
     End Sub
 End Class
