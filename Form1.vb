@@ -11,38 +11,12 @@ Public Class Form1
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
 
-        ' Assign variables
-
-        Dim Seg As Integer
-        Dim TotalWidth As Double
-        Dim TotalLength As Double
-        Dim SegmentWidth As Double
-        Dim SegmentLength As Double
-
-        Dim Q As Double
-        Dim B As Double
-        Dim C As Double
-        Dim X As Double
-        Dim Theta As Double
-        Dim Y As Double
-        Dim IR As Double
-        Dim OUR As Double
-        Dim PIE As Double
-        Dim Deg As Double
-        Dim Degr As Double
-        Dim Z As Double
-        Dim C1 As Double
-        Dim V1 As Double
-        Dim V2 As Double
-        Dim V3 As Double
-
-        Dim NoTitle = ""
-
-        JobNumber = TextBox1.Text
-        PieceName = TextBox2.Text
-        PlateType = If(RadioButton1.Checked, Plate.INNER, Plate.OUTER)
-
+        '
         ' Validate Radius values
+        '
+        JobNumber = TextBox2.Text
+        PieceName = TextBox1.Text
+        Dim NoTitle = ""
         If OuterRadius <= 0 Then
             MsgBox("The outer radius must be greater than zero.", vbOKOnly, NoTitle)
             Return
@@ -57,73 +31,112 @@ Public Class Form1
             Return
         End If
 
+        '
         ' STEP 1: Calculate
+        '
+        Dim X As Double = OuterRadius - InnerRadius
+        Dim Theta As Double = Atan(ConeHeight / X)
+        Dim Y As Double = (PlateThickness / 2) * Sin(Theta)
+        Dim IR As Double
+        Dim OUR As Double
+        PlateType = If(RadioButton1.Checked, Plate.INNER, Plate.OUTER)
 
-        X = OuterRadius - InnerRadius
-        Theta = Atan(ConeHeight / X)
-        Y = (PlateThickness / 2) * Sin(Theta)
-
+        '
+        ' Line numbers refer to legacy code in Cone95 program
+        '
         If PlateType = Plate.INNER Then
+
+            '
+            ' Line 1540
+            '
             IR = InnerRadius + Y
             OUR = OuterRadius + Y
         Else
+
+            '
             ' Line 460
+            '
             IR = InnerRadius - Y
             OUR = OuterRadius - Y
         End If
 
         OutsideRadius = OUR / Cos(Theta)
         InsideRadius = IR / Cos(Theta)
-        PIE = 3.1416 ' Can I use PI from Math namespace?
-        Deg = 2 * PIE * Cos(Theta)
+        Const PIE As Double = 3.1416
+        Dim Deg As Double = 2 * PIE * Cos(Theta)
         Degree = FormatNumber((Deg * 180) / PIE, 4)
 
+        '
         ' Line 540
-        If Deg > 0 AndAlso Deg <= PIE / 2 Then 'goto 1290
+        '
+        Dim C As Double
+        Dim SegmentLength As Double
+        Dim SegmentWidth As Double
+
+        If Deg > 0 AndAlso Deg <= PIE / 2 Then
+
+            '
+            ' Line 1290
+            '
             C = PIE / 2 - Deg
             SecondCutOffRadius = 2 * OutsideRadius * Sin(C / 2)
             FirstCutOffRadius = 2 * OutsideRadius * Sin(Deg / 2)
             SegmentLength = FirstCutOffRadius + 1
-            B = (Sin(Deg / 4)) ^ 2 * InsideRadius * 2
+            Dim B As Double = (Sin(Deg / 4)) ^ 2 * InsideRadius * 2
             SegmentWidth = (OutsideRadius - InsideRadius) + B + 1
-        ElseIf Deg > PIE / 2 AndAlso Deg <= PIE Then ' goto 1360
+        ElseIf Deg > PIE / 2 AndAlso Deg <= PIE Then
+
+            '
+            ' Line 1360
+            '
             C = PIE - Deg
             SegmentLength = Sin(Deg / 2) * OutsideRadius * 2 + 1
             SegmentWidth = (Sin(Deg / 4)) ^ 2 * InsideRadius * 2 + (OutsideRadius - InsideRadius) + 1
-        ElseIf Deg > PIE AndAlso Deg <= 3 * PIE / 2 Then ' goto 1400
+        ElseIf Deg > PIE AndAlso Deg <= 3 * PIE / 2 Then
+
+            '
+            ' Line 1400
+            '
             C = 3 * PIE / 2 - Deg
             SegmentLength = OutsideRadius * 2 + 1
             SegmentWidth = Sin(Deg - PIE) * OutsideRadius + OutsideRadius + 1
-        ElseIf Deg > 3 * PIE / 2 AndAlso Deg <= 2 * PIE Then ' goto 1440
+        ElseIf Deg > 3 * PIE / 2 AndAlso Deg <= 2 * PIE Then
+
+            '
+            ' Line 1440
+            '
             C = 2 * PIE - Deg
             SegmentLength = OutsideRadius * 2 + 1
             SegmentWidth = SegmentLength
         End If
 
-        ' goto 1490
-
+        '
+        ' Line 1490
         ' Calculate CutOff Radii
-        Q = (PIE / 2 - C) / 2
+        '
+        Dim Q As Double = (PIE / 2 - C) / 2
         FirstCutOffRadius = 2 * OutsideRadius * Sin(Q)
         SecondCutOffRadius = 2 * OutsideRadius * Sin(C / 2)
 
-        'goto 590
-        ' goto 650
-
+        '
+        ' Line 650
         ' Sixteenth Rounding Routine
+        '
         OutsideRadius = Int(OutsideRadius * 16 + 0.5) / 16
         InsideRadius = Int(InsideRadius * 16 + 0.5) / 16
         Difference = OutsideRadius - InsideRadius
         FirstCutOffRadius = Int(FirstCutOffRadius * 16 + 0.5) / 16
         SecondCutOffRadius = Int(SecondCutOffRadius * 16 + 0.5) / 16
 
-        ' goto 1570
-
+        '
+        ' Line 1570
         ' STEP 2: Prompt for figuring in segments
-
-        Dim prompt As New StringBuilder
-
-        With prompt
+        '
+        Dim Seg As Double
+        Dim TotalLength As Double
+        Dim TotalWidth As Double
+        Dim Prompt As New StringBuilder
+        With Prompt
             .Append($"Outside Radius = {OutsideRadius}").AppendLine()
             .Append($"Inside Radius = {InsideRadius}").AppendLine()
             .Append($"Difference = {Difference}").AppendLine()
@@ -133,32 +146,45 @@ Public Class Form1
             .Append("Do you want to figure your plate size in segments?")
         End With
 
-        ' Prompt for figuring in segments
-        ' If in segments goto 1720 else goto 2000
-        If MsgBox(prompt.ToString(), vbYesNo, NoTitle).Equals(MsgBoxResult.Yes) Then
+        If MsgBox(Prompt.ToString(), vbYesNo, NoTitle).Equals(MsgBoxResult.Yes) Then
+
+            '
+            ' Line 1720
+            '
             Do
+                '
                 ' Get number of segments
+                '
                 Dim SegmentForm As New SegmentsForm
                 SegmentForm.ShowDialog()
                 Seg = SegmentForm.TextBox1.Text
-                ' Validate Seg value
-                Degr = Deg / Seg
-                Z = (Sin(Degr / 4)) ^ 2 * InsideRadius * 2
-                C1 = Sin(Degr / 2) * InsideRadius * 2
-                V1 = (OutsideRadius ^ 2 - (C1 / 2) ^ 2) ^ 0.5
-                V2 = (InsideRadius ^ 2 - (C1 / 2) ^ 2) ^ 0.5
-                V3 = V1 - V2 + 0.5
+
+                '
+                ' Line 1780
+                ' Calculation of width and length of plate per segments
+                '
+                Dim Degr As Double = Deg / Seg
+                Dim Z As Double = (Sin(Degr / 4)) ^ 2 * InsideRadius * 2
+                Dim C1 As Double = Sin(Degr / 2) * InsideRadius * 2
+                Dim V1 As Double = (OutsideRadius ^ 2 - (C1 / 2) ^ 2) ^ 0.5
+                Dim V2 As Double = (InsideRadius ^ 2 - (C1 / 2) ^ 2) ^ 0.5
+                Dim V3 As Double = V1 - V2 + 0.5
                 TotalLength = (Seg - 1) * V3 + Z + Difference + 1
                 TotalWidth = Sin(Degr / 2) * OutsideRadius * 2 + 1
 
-                ' Round
+                '
+                ' Rounding
+                '
                 TotalWidth = FormatNumber(TotalWidth, 4)
                 TotalLength = FormatNumber(TotalLength, 4)
                 SegmentWidth = FormatNumber(SegmentWidth, 4)
                 SegmentLength = FormatNumber(SegmentLength, 4)
 
-                prompt.Clear()
-                With prompt
+                '
+                ' Confirm number of segments
+                '
+                Prompt.Clear()
+                With Prompt
                     .Append($"Number of segments = {Seg}").AppendLine()
                     .Append($"\tTotal Width = {TotalWidth}").AppendLine()
                     .Append($"\tTotal Length = {TotalLength}").AppendLine()
@@ -167,12 +193,14 @@ Public Class Form1
                     .Append($"\tTotal Length = {SegmentLength}").AppendLine()
                     .Append("Do you want to change the number of segments?")
                 End With
-            Loop Until MsgBox(prompt.ToString(), vbYesNo, NoTitle).Equals(MsgBoxResult.No)
+            Loop Until MsgBox(Prompt.ToString(), vbYesNo, NoTitle).Equals(MsgBoxResult.No)
         End If
 
-        ' Test to show contents
-        prompt.Clear()
-        With prompt
+        '
+        ' Create PDF
+        '
+        Prompt.Clear()
+        With Prompt
             .Append(PieceName).Append(" "c)
             .Append(JobNumber).Append(" "c)
             .Append(PlateType).Append(" "c)
@@ -195,13 +223,14 @@ Public Class Form1
         ConfirmResources()
         Dim script = New ProcessStartInfo
         script.FileName = "create_pdf"
-        script.Arguments = prompt.ToString()
+        script.Arguments = Prompt.ToString()
         script.CreateNoWindow = True
         Process.Start(script)
 
     End Sub
 
     Private Sub ConfirmResources()
+
         '
         ' Install resources if not in path
         '
@@ -222,9 +251,14 @@ Public Class Form1
             bit.Save(exe, ImageFormat.Png)
             exe.Close()
         End If
+
     End Sub
 
     Private Sub TextBox_TextChanged(sender As Object, e As EventArgs) Handles TextBox3.TextChanged, TextBox4.TextChanged, TextBox5.TextChanged, TextBox6.TextChanged
+
+        '
+        ' Get associated value of text box
+        '
         If sender.Equals(TextBox3) Then
             CorrectText(TextBox3, OuterRadius)
         ElseIf sender.Equals(TextBox4) Then
@@ -237,6 +271,10 @@ Public Class Form1
     End Sub
 
     Private Sub CorrectText(ByRef sender As TextBox, ByRef var As Double)
+
+        '
+        ' Only allow numbers as values
+        '
         If sender.Text.Contains(Int(var) & ". in.") Then
             Return
         End If
@@ -253,12 +291,20 @@ Public Class Form1
         End If
     End Sub
     Private Sub Form_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBox1.KeyPress, TextBox2.KeyPress, TextBox3.KeyPress, TextBox4.KeyPress, TextBox5.KeyPress, TextBox6.KeyPress
+
+        '
+        ' Listen for 'Enter' and begin calculation
+        '
         If Char.IsWhiteSpace(e.KeyChar) Then
             Button1_Click(sender, e)
         End If
     End Sub
 
     Private Sub TextBox_MouseClick(sender As Object, e As MouseEventArgs) Handles TextBox1.MouseClick, TextBox2.MouseClick, TextBox3.MouseClick, TextBox4.MouseClick, TextBox5.MouseClick, TextBox6.MouseClick
+
+        '
+        ' Select all text when mouse clicks the text box or switched focus
+        '
         CType(sender, TextBox).SelectAll()
     End Sub
 End Class
