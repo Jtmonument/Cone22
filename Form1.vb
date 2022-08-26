@@ -128,7 +128,7 @@ Public Class Form1
         ' Line 1570
         ' STEP 2: Prompt for figuring in segments
         '
-        Dim Seg As Double
+        Dim Seg As Double = 1
         Dim TotalLength As Double
         Dim TotalWidth As Double
         Dim Prompt As New StringBuilder
@@ -138,7 +138,7 @@ Public Class Form1
             .Append($"Difference = {Difference}").AppendLine()
             .Append($"First Cut-Off Radius = {FirstCutOffRadius}").AppendLine()
             .Append($"Second Cut-Off Radius = {SecondCutOffRadius}").AppendLine()
-            .Append($"Degrees = {Degree}").AppendLine()
+            .Append($"Degrees = {Degree}").AppendLine().AppendLine()
             .Append("Do you want to figure your plate size in segments?")
         End With
 
@@ -159,7 +159,7 @@ Public Class Form1
                 ' Line 1780
                 ' Calculation of width and length of plate per segments
                 '
-                Dim Degr As Double = Deg / Seg
+                Dim Degr = Deg / Seg
                 Dim Z As Double = (Sin(Degr / 4)) ^ 2 * InsideRadius * 2
                 Dim C1 As Double = Sin(Degr / 2) * InsideRadius * 2
                 Dim V1 As Double = (OutsideRadius ^ 2 - (C1 / 2) ^ 2) ^ 0.5
@@ -182,14 +182,21 @@ Public Class Form1
                 Prompt.Clear()
                 With Prompt
                     .Append($"Number of segments = {Seg}").AppendLine()
-                    .Append($"\tTotal Width = {TotalWidth}").AppendLine()
-                    .Append($"\tTotal Length = {TotalLength}").AppendLine()
+                    .Append($"{vbTab}Total Width = {TotalWidth}").AppendLine()
+                    .Append($"{vbTab}Total Length = {TotalLength}").AppendLine()
                     .Append($"Segment dimensions:").AppendLine()
-                    .Append($"\tTotal Width = {SegmentWidth}").AppendLine()
-                    .Append($"\tTotal Length = {SegmentLength}").AppendLine()
+                    .Append($"{vbTab}Total Width = {SegmentWidth}").AppendLine()
+                    .Append($"{vbTab}Total Length = {SegmentLength}").AppendLine().AppendLine()
                     .Append("Do you want to change the number of segments?")
                 End With
             Loop Until MsgBox(Prompt.ToString(), vbYesNo, NoTitle).Equals(MsgBoxResult.No)
+        Else
+
+            '
+            ' Assign total dimensions and Round
+            '
+            TotalWidth = FormatNumber(SegmentWidth, 4)
+            TotalLength = FormatNumber(SegmentLength, 4)
         End If
 
         '
