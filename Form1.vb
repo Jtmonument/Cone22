@@ -35,12 +35,12 @@ Public Class Form1
         Dim Y As Double = (PlateThickness / 2) * Sin(Theta)
         Dim IR As Double
         Dim OUR As Double
-        PlateType = If(RadioButton1.Checked, Plate.INNER, Plate.OUTER)
+        PlateType = If(RadioButton1.Checked, Plate.INSIDE, Plate.OUTSIDE)
 
         '
         ' Line numbers refer to legacy code in Cone95 program
         '
-        If PlateType = Plate.INNER Then
+        If PlateType = Plate.INSIDE Then
 
             '
             ' Line 1540

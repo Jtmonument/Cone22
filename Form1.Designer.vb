@@ -264,7 +264,7 @@ Partial Class Form1
     Friend SecondCutOffRadius As Double
 
     Friend Enum Plate
-        INNER
-        OUTER
+        INSIDE
+        OUTSIDE
     End Enum
 End Class
