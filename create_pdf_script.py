@@ -11,7 +11,7 @@ def get_args():
         job_number = "Job Number: " + sys.argv[2]
         global inputs
         inputs = {
-            "Type": "Inner Plates" if int(sys.argv[3]) == 0 else "Outer Plates",
+            "Type": "Inside Plates" if int(sys.argv[3]) == 0 else "Outside Plates",
             "Outer Radius": sys.argv[4] + " in.",
             "Inner Radius": sys.argv[5] + " in.",
             "Height": sys.argv[6] + " in.",
