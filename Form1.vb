@@ -202,58 +202,7 @@ Public Class Form1
         '
         ' Create PDF
         '
-        Prompt.Clear()
-        With Prompt
-            .Append(PieceName).Append(" "c)
-            .Append(JobNumber).Append(" "c)
-            .Append(PlateType).Append(" "c)
-            .Append(OuterRadius).Append(" "c)
-            .Append(InnerRadius).Append(" "c)
-            .Append(ConeHeight).Append(" "c)
-            .Append(PlateThickness).Append(" "c)
-            .Append(OutsideRadius).Append(" "c)
-            .Append(InsideRadius).Append(" "c)
-            .Append(Difference).Append(" "c)
-            .Append(Degree).Append(" "c)
-            .Append(FirstCutOffRadius).Append(" "c)
-            .Append(SecondCutOffRadius).Append(" "c)
-            .Append(Seg).Append(" "c)
-            .Append(TotalWidth).Append(" "c)
-            .Append(TotalLength).Append(" "c)
-            .Append(SegmentWidth).Append(" "c)
-            .Append(SegmentLength)
-        End With
-        ConfirmResources()
-        Dim script = New ProcessStartInfo
-        script.FileName = "create_pdf"
-        script.Arguments = Prompt.ToString()
-        script.CreateNoWindow = True
-        Process.Start(script)
 
-    End Sub
-
-    Private Sub ConfirmResources()
-
-        '
-        ' Install resources if not in path
-        '
-        If Not File.Exists("create_pdf.exe") Then
-            Dim exe As FileStream = File.Open("create_pdf.tmp", FileMode.Create, FileAccess.Write)
-            Dim contents As Byte() = My.Resources.create_pdf
-            exe.Write(contents, 0, contents.Length)
-            exe.Close()
-            Dim Args = "/c ren create_pdf.tmp create_pdf.exe"
-            Dim script = New ProcessStartInfo("cmd", Args)
-            script.CreateNoWindow = True
-            Process.Start(script).WaitForExit()
-        End If
-
-        If Not File.Exists("processbarron_logo_dark.png") Then
-            Dim exe As FileStream = File.Open("processbarron_logo_dark.png", FileMode.Create, FileAccess.Write)
-            Dim bit As Bitmap = My.Resources.processbarron_logo_dark
-            bit.Save(exe, ImageFormat.Png)
-            exe.Close()
-        End If
 
     End Sub
 
