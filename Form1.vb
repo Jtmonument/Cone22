@@ -2,6 +2,12 @@
 Imports System.IO
 Imports System.Math
 Imports System.Text
+Imports System.Threading
+Imports PdfSharpCore.Drawing
+Imports PdfSharpCore.Fonts
+Imports PdfSharpCore.Pdf
+Imports PdfSharpCore.Utils
+Imports Microsoft.WindowsAPICodePack.Shell
 
 Public Class Form1
 
@@ -154,27 +160,35 @@ Public Class Form1
                 Dim SegmentForm As New SegmentsForm
                 SegmentForm.ShowDialog()
                 Seg = SegmentForm.TextBox1.Text
-
-                '
-                ' Line 1780
-                ' Calculation of width and length of plate per segments
-                '
-                Dim Degr = Deg / Seg
-                Dim Z As Double = (Sin(Degr / 4)) ^ 2 * InsideRadius * 2
-                Dim C1 As Double = Sin(Degr / 2) * InsideRadius * 2
-                Dim V1 As Double = (OutsideRadius ^ 2 - (C1 / 2) ^ 2) ^ 0.5
-                Dim V2 As Double = (InsideRadius ^ 2 - (C1 / 2) ^ 2) ^ 0.5
-                Dim V3 As Double = V1 - V2 + 0.5
-                TotalLength = (Seg - 1) * V3 + Z + Difference + 1
-                TotalWidth = Sin(Degr / 2) * OutsideRadius * 2 + 1
-
-                '
-                ' Rounding
-                '
-                TotalWidth = FormatNumber(TotalWidth, 4)
-                TotalLength = FormatNumber(TotalLength, 4)
-                SegmentWidth = FormatNumber(SegmentWidth, 4)
-                SegmentLength = FormatNumber(SegmentLength, 4)
+                If Not Seg = 1 Then
+                    '
+                    ' Line 1780
+                    ' Calculation of width and length of plate per segments
+                    '
+                    Dim Degr = Deg / Seg
+                    Dim Z As Double = (Sin(Degr / 4)) ^ 2 * InsideRadius * 2
+                    Dim C1 As Double = Sin(Degr / 2) * InsideRadius * 2
+                    Dim V1 As Double = (OutsideRadius ^ 2 - (C1 / 2) ^ 2) ^ 0.5
+                    Dim V2 As Double = (InsideRadius ^ 2 - (C1 / 2) ^ 2) ^ 0.5
+                    Dim V3 As Double = V1 - V2 + 0.5
+                    TotalWidth = (Seg - 1) * V3 + Z + Difference + 1
+                    TotalLength = Sin(Degr / 2) * OutsideRadius * 2 + 1
+                    '
+                    ' Rounding
+                    '
+                    TotalWidth = FormatNumber(TotalWidth, 4)
+                    TotalLength = FormatNumber(TotalLength, 4)
+                    SegmentWidth = FormatNumber(SegmentWidth, 4)
+                    SegmentLength = FormatNumber(SegmentLength, 4)
+                Else
+                    '
+                    ' Rounding
+                    '
+                    TotalWidth = FormatNumber(SegmentWidth, 4)
+                    TotalLength = FormatNumber(SegmentLength, 4)
+                    SegmentWidth = FormatNumber(SegmentWidth, 4)
+                    SegmentLength = FormatNumber(SegmentLength, 4)
+                End If
 
                 '
                 ' Confirm number of segments
@@ -202,9 +216,178 @@ Public Class Form1
         '
         ' Create PDF
         '
-
+        CreatePDF(Seg, TotalWidth, TotalLength, SegmentWidth, SegmentLength)
 
     End Sub
+
+    Private Sub CreatePDF(Seg As Double, TotalWidth As Double, TotalLength As Double, SegmentWidth As Double, SegmentLength As Double)
+        '
+        ' Pdf Document
+        '
+        Dim Document As New PdfDocument()
+        Dim Page = Document.AddPage()
+        Dim Graphics = XGraphics.FromPdfPage(Page)
+        '
+        ' Logo
+        '
+        Dim LogoFileName = "processbarron_logo_dark.png"
+        If File.Exists(LogoFileName) Then
+            My.Resources.processbarron_logo_dark.Save(LogoFileName, ImageFormat.Png)
+        End If
+        Dim ProcessBarronLogo = XImage.FromFile(LogoFileName)
+        Graphics.DrawImage(ProcessBarronLogo, 10, 10)
+        '
+        ' Styling and Formatting
+        '
+        Dim TextColor = XBrushes.Black
+        Dim Format = XStringFormats.TopRight
+        Dim Layout As New XRect(-20, 10, Page.Width, Page.Height)
+        Dim Font As New XFont("Arial", 20)
+        '
+        ' Title
+        '
+        Graphics.DrawString("Cone Development", Font, TextColor, Layout, Format)
+        Layout.Y += 30
+        Graphics.DrawString("Job Number: " & JobNumber, Font, TextColor, Layout, Format)
+        Layout.Y += 30
+        Graphics.DrawString("Piece Name: " & PieceName, Font, TextColor, Layout, Format)
+        '
+        ' Input
+        '
+        Dim TitleFont As New XFont("Arial", 25, XFontStyle.Bold)
+        Dim TitleFormat = XStringFormats.Center
+        Dim HeaderPoint = Page.Width.Point / 7.5
+        Dim ResultPoint = Page.Width.Point / 1.5
+        Layout.X = 0
+        Layout.Y = -250
+        Graphics.DrawString("Input", TitleFont, TextColor, Layout, TitleFormat)
+        Format = XStringFormats.CenterLeft
+
+        Layout.X = HeaderPoint
+        Layout.Y += 30
+        Graphics.DrawString("Plate Type: ", Font, TextColor, Layout, Format)
+        Layout.X = ResultPoint
+        Graphics.DrawString(GetPlateType(), Font, TextColor, Layout, Format)
+
+        Layout.X = HeaderPoint
+        Layout.Y += 30
+        Graphics.DrawString("Outer Radius: ", Font, TextColor, Layout, Format)
+        Layout.X = ResultPoint
+        Graphics.DrawString(OuterRadius & " in.", Font, TextColor, Layout, Format)
+
+        Layout.X = HeaderPoint
+        Layout.Y += 30
+        Graphics.DrawString("Inner Radius: ", Font, TextColor, Layout, Format)
+        Layout.X = ResultPoint
+        Graphics.DrawString(InnerRadius & " in.", Font, TextColor, Layout, Format)
+
+        Layout.X = HeaderPoint
+        Layout.Y += 30
+        Graphics.DrawString("Height: ", Font, TextColor, Layout, Format)
+        Layout.X = ResultPoint
+        Graphics.DrawString(ConeHeight & " in.", Font, TextColor, Layout, Format)
+
+        Layout.X = HeaderPoint
+        Layout.Y += 30
+        Graphics.DrawString("Plate Thickness: ", Font, TextColor, Layout, Format)
+        Layout.X = ResultPoint
+        Graphics.DrawString(PlateThickness & " in.", Font, TextColor, Layout, Format)
+        '
+        ' Ouput
+        '
+        Layout.X = 0
+        Layout.Y += 50
+        Graphics.DrawString("Output", TitleFont, TextColor, Layout, TitleFormat)
+
+        Layout.X = HeaderPoint
+        Layout.Y += 30
+        Graphics.DrawString("Outside Radius: ", Font, TextColor, Layout, Format)
+        Layout.X = ResultPoint
+        Graphics.DrawString(OutsideRadius & " in.", Font, TextColor, Layout, Format)
+
+        Layout.X = HeaderPoint
+        Layout.Y += 30
+        Graphics.DrawString("Inside Radius: ", Font, TextColor, Layout, Format)
+        Layout.X = ResultPoint
+        Graphics.DrawString(InsideRadius & " in.", Font, TextColor, Layout, Format)
+
+        Layout.X = HeaderPoint
+        Layout.Y += 30
+        Graphics.DrawString("Difference: ", Font, TextColor, Layout, Format)
+        Layout.X = ResultPoint
+        Graphics.DrawString(Difference & " in.", Font, TextColor, Layout, Format)
+
+        Layout.X = HeaderPoint
+        Layout.Y += 30
+        Graphics.DrawString("Degree: ", Font, TextColor, Layout, Format)
+        Layout.X = ResultPoint
+        Graphics.DrawString(Degree, Font, TextColor, Layout, Format)
+
+        Layout.X = HeaderPoint
+        Layout.Y += 30
+        Graphics.DrawString("First Cut-Off Radius: ", Font, TextColor, Layout, Format)
+        Layout.X = ResultPoint
+        Graphics.DrawString(FirstCutOffRadius & " in.", Font, TextColor, Layout, Format)
+
+        Layout.X = HeaderPoint
+        Layout.Y += 30
+        Graphics.DrawString("Second Cut-Off Radius: ", Font, TextColor, Layout, Format)
+        Layout.X = ResultPoint
+        Graphics.DrawString(SecondCutOffRadius & " in.", Font, TextColor, Layout, Format)
+        '
+        ' Plate Size Information
+        '
+        Layout.X = 0
+        Layout.Y += 50
+        Graphics.DrawString("Plate Size Information", TitleFont, TextColor, Layout, TitleFormat)
+
+        Layout.X = HeaderPoint
+        Layout.Y += 30
+        Graphics.DrawString("Number of Segments: ", Font, TextColor, Layout, Format)
+        Layout.X = ResultPoint
+        Graphics.DrawString(Seg, Font, TextColor, Layout, Format)
+
+        Layout.X = HeaderPoint
+        Layout.Y += 30
+        Graphics.DrawString("Total Width: ", Font, TextColor, Layout, Format)
+        Layout.X = ResultPoint
+        Graphics.DrawString(TotalWidth & " in.", Font, TextColor, Layout, Format)
+
+        Layout.X = HeaderPoint
+        Layout.Y += 30
+        Graphics.DrawString("Total Length: ", Font, TextColor, Layout, Format)
+        Layout.X = ResultPoint
+        Graphics.DrawString(TotalLength & " in.", Font, TextColor, Layout, Format)
+
+        If Seg > 1 Then
+            Layout.X = HeaderPoint
+            Layout.Y += 30
+            Graphics.DrawString("Segment Width: ", Font, TextColor, Layout, Format)
+            Layout.X = ResultPoint
+            Graphics.DrawString(SegmentWidth & " in.", Font, TextColor, Layout, Format)
+
+            Layout.X = HeaderPoint
+            Layout.Y += 30
+            Graphics.DrawString("Segment Length: ", Font, TextColor, Layout, Format)
+            Layout.X = ResultPoint
+            Graphics.DrawString(SegmentLength & " in.", Font, TextColor, Layout, Format)
+        End If
+        '
+        ' Save and view pdf
+        '
+        Dim CurrentDirectory = Directory.GetCurrentDirectory()
+        Directory.SetCurrentDirectory(KnownFolders.Downloads.Path)
+        Document.Save("helloworld.pdf")
+        Dim PdfFile As New ProcessStartInfo("cmd", String.Format("/r start {0}\helloworld.pdf", KnownFolders.Downloads.Path))
+        PdfFile.CreateNoWindow = True
+        Process.Start(PdfFile)
+        Directory.SetCurrentDirectory(CurrentDirectory)
+    End Sub
+
+    Private Function GetPlateType() As String
+        Dim PlateTypeString = [Enum].GetName(PlateType)
+        Return PlateTypeString.Chars(0) & PlateTypeString.Substring(1).ToLower() & " Plates"
+    End Function
 
     Private Sub TextBox_TextChanged(sender As Object, e As EventArgs) Handles TextBox3.TextChanged, TextBox4.TextChanged, TextBox5.TextChanged, TextBox6.TextChanged
 
