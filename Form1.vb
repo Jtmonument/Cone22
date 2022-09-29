@@ -2,11 +2,8 @@
 Imports System.IO
 Imports System.Math
 Imports System.Text
-Imports System.Threading
 Imports PdfSharpCore.Drawing
-Imports PdfSharpCore.Fonts
 Imports PdfSharpCore.Pdf
-Imports PdfSharpCore.Utils
 Imports Microsoft.WindowsAPICodePack.Shell
 
 Public Class Form1
@@ -16,8 +13,8 @@ Public Class Form1
         '
         ' Validate Radius values
         '
-        JobNumber = TextBox2.Text
-        PieceName = TextBox1.Text
+        JobNumber = TextBox1.Text
+        PieceName = TextBox2.Text
         Dim NoTitle = ""
         If OuterRadius <= 0 Then
             MsgBox("The outer radius must be greater than zero.", vbOKOnly, NoTitle)
@@ -134,7 +131,7 @@ Public Class Form1
         ' Line 1570
         ' STEP 2: Prompt for figuring in segments
         '
-        Dim Seg As Double = 1
+        Dim NumOfSegments As Double = 1
         Dim TotalLength As Double
         Dim TotalWidth As Double
         Dim Prompt As New StringBuilder
@@ -159,20 +156,20 @@ Public Class Form1
                 '
                 Dim SegmentForm As New SegmentsForm
                 SegmentForm.ShowDialog()
-                Seg = SegmentForm.TextBox1.Text
-                If Not Seg = 1 Then
+                NumOfSegments = SegmentForm.TextBox1.Text
+                If Not NumOfSegments = 1 Then
                     '
                     ' Line 1780
                     ' Calculation of width and length of plate per segments
                     '
-                    Dim Degr = Deg / Seg
+                    Dim Degr = Deg / NumOfSegments
                     Dim Z As Double = (Sin(Degr / 4)) ^ 2 * InsideRadius * 2
                     Dim C1 As Double = Sin(Degr / 2) * InsideRadius * 2
                     Dim V1 As Double = (OutsideRadius ^ 2 - (C1 / 2) ^ 2) ^ 0.5
                     Dim V2 As Double = (InsideRadius ^ 2 - (C1 / 2) ^ 2) ^ 0.5
                     Dim V3 As Double = V1 - V2 + 0.5
-                    TotalWidth = (Seg - 1) * V3 + Z + Difference + 1
-                    TotalLength = Sin(Degr / 2) * OutsideRadius * 2 + 1
+                    TotalLength = (NumOfSegments - 1) * V3 + Z + Difference + 1
+                    TotalWidth = Sin(Degr / 2) * OutsideRadius * 2 + 1
                     '
                     ' Rounding
                     '
@@ -195,10 +192,10 @@ Public Class Form1
                 '
                 Prompt.Clear()
                 With Prompt
-                    .Append($"Number of segments = {Seg}").AppendLine()
+                    .Append($"Number of segments = {NumOfSegments}").AppendLine()
                     .Append($"{vbTab}Total Width = {TotalWidth}").AppendLine()
                     .Append($"{vbTab}Total Length = {TotalLength}").AppendLine()
-                    .Append($"Segment dimensions:").AppendLine()
+                    .Append($"Total for using one segment:").AppendLine()
                     .Append($"{vbTab}Total Width = {SegmentWidth}").AppendLine()
                     .Append($"{vbTab}Total Length = {SegmentLength}").AppendLine().AppendLine()
                     .Append("Do you want to change the number of segments?")
@@ -216,11 +213,11 @@ Public Class Form1
         '
         ' Create PDF
         '
-        CreatePDF(Seg, TotalWidth, TotalLength, SegmentWidth, SegmentLength)
+        CreatePDF(NumOfSegments, TotalWidth, TotalLength, SegmentWidth, SegmentLength)
 
     End Sub
 
-    Private Sub CreatePDF(Seg As Double, TotalWidth As Double, TotalLength As Double, SegmentWidth As Double, SegmentLength As Double)
+    Private Sub CreatePDF(NumOfSegments As Double, TotalWidth As Double, TotalLength As Double, SegmentWidth As Double, SegmentLength As Double)
         '
         ' Pdf Document
         '
@@ -248,9 +245,9 @@ Public Class Form1
         '
         Graphics.DrawString("Cone Development", Font, TextColor, Layout, Format)
         Layout.Y += 30
-        Graphics.DrawString("Job Number: " & JobNumber, Font, TextColor, Layout, Format)
+        Graphics.DrawString($"Job Number: {JobNumber}", Font, TextColor, Layout, Format)
         Layout.Y += 30
-        Graphics.DrawString("Piece Name: " & PieceName, Font, TextColor, Layout, Format)
+        Graphics.DrawString($"Piece Name: {PieceName}", Font, TextColor, Layout, Format)
         '
         ' Input
         '
@@ -345,7 +342,7 @@ Public Class Form1
         Layout.Y += 30
         Graphics.DrawString("Number of Segments: ", Font, TextColor, Layout, Format)
         Layout.X = ResultPoint
-        Graphics.DrawString(Seg, Font, TextColor, Layout, Format)
+        Graphics.DrawString(NumOfSegments, Font, TextColor, Layout, Format)
 
         Layout.X = HeaderPoint
         Layout.Y += 30
@@ -359,7 +356,7 @@ Public Class Form1
         Layout.X = ResultPoint
         Graphics.DrawString(TotalLength & " in.", Font, TextColor, Layout, Format)
 
-        If Seg > 1 Then
+        If NumOfSegments > 1 Then
             Layout.X = HeaderPoint
             Layout.Y += 30
             Graphics.DrawString("Segment Width: ", Font, TextColor, Layout, Format)
@@ -377,8 +374,8 @@ Public Class Form1
         '
         Dim CurrentDirectory = Directory.GetCurrentDirectory()
         Directory.SetCurrentDirectory(KnownFolders.Downloads.Path)
-        Document.Save("helloworld.pdf")
-        Dim PdfFile As New ProcessStartInfo("cmd", String.Format("/r start {0}\helloworld.pdf", KnownFolders.Downloads.Path))
+        Document.Save($"{PieceName}.pdf")
+        Dim PdfFile As New ProcessStartInfo("cmd", $"/r start {KnownFolders.Downloads.Path}\{PieceName}.pdf")
         PdfFile.CreateNoWindow = True
         Process.Start(PdfFile)
         Directory.SetCurrentDirectory(CurrentDirectory)
@@ -386,7 +383,7 @@ Public Class Form1
 
     Private Function GetPlateType() As String
         Dim PlateTypeString = [Enum].GetName(PlateType)
-        Return PlateTypeString.Chars(0) & PlateTypeString.Substring(1).ToLower() & " Plates"
+        Return $"{PlateTypeString.Chars(0)}{PlateTypeString.Substring(1).ToLower()} Plates"
     End Function
 
     Private Sub TextBox_TextChanged(sender As Object, e As EventArgs) Handles TextBox3.TextChanged, TextBox4.TextChanged, TextBox5.TextChanged, TextBox6.TextChanged
