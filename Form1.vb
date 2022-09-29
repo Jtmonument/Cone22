@@ -228,7 +228,7 @@ Public Class Form1
         ' Logo
         '
         Dim LogoFileName = "processbarron_logo_dark.png"
-        If File.Exists(LogoFileName) Then
+        If Not File.Exists(LogoFileName) Then
             My.Resources.processbarron_logo_dark.Save(LogoFileName, ImageFormat.Png)
         End If
         Dim ProcessBarronLogo = XImage.FromFile(LogoFileName)
