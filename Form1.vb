@@ -256,7 +256,7 @@ Public Class Form1
         Dim HeaderPoint = Page.Width.Point / 7.5
         Dim ResultPoint = Page.Width.Point / 1.5
         Layout.X = 0
-        Layout.Y = -250
+        Layout.Y = -280
         Graphics.DrawString("Input", TitleFont, TextColor, Layout, TitleFormat)
         Format = XStringFormats.CenterLeft
 
@@ -336,13 +336,20 @@ Public Class Form1
         '
         Layout.X = 0
         Layout.Y += 50
-        Graphics.DrawString("Plate Size Information", TitleFont, TextColor, Layout, TitleFormat)
+        If NumOfSegments > 1 Then
+            Graphics.DrawString("Plate Size Comparison", TitleFont, TextColor, Layout, TitleFormat)
+            Layout.X = HeaderPoint
+            Layout.Y += 30
+            Graphics.DrawString("Number of Segments: ", Font, TextColor, Layout, Format)
+            Layout.X = ResultPoint
+            Graphics.DrawString(NumOfSegments, Font, TextColor, Layout, Format)
+        Else
+            Graphics.DrawString("Plate Size Information", TitleFont, TextColor, Layout, TitleFormat)
+        End If
 
-        Layout.X = HeaderPoint
+        Layout.X = 0
         Layout.Y += 30
-        Graphics.DrawString("Number of Segments: ", Font, TextColor, Layout, Format)
-        Layout.X = ResultPoint
-        Graphics.DrawString(NumOfSegments, Font, TextColor, Layout, Format)
+        Graphics.DrawString($"Plate Usage for 1 Segment", Font, TextColor, Layout, TitleFormat)
 
         Layout.X = HeaderPoint
         Layout.Y += 30
@@ -357,15 +364,19 @@ Public Class Form1
         Graphics.DrawString(TotalLength & " in.", Font, TextColor, Layout, Format)
 
         If NumOfSegments > 1 Then
+            Layout.X = 0
+            Layout.Y += 30
+            Graphics.DrawString($"Plate Usage for {NumOfSegments} Segments", Font, TextColor, Layout, TitleFormat)
+
             Layout.X = HeaderPoint
             Layout.Y += 30
-            Graphics.DrawString("Segment Width: ", Font, TextColor, Layout, Format)
+            Graphics.DrawString("Total Width: ", Font, TextColor, Layout, Format)
             Layout.X = ResultPoint
             Graphics.DrawString(SegmentWidth & " in.", Font, TextColor, Layout, Format)
 
             Layout.X = HeaderPoint
             Layout.Y += 30
-            Graphics.DrawString("Segment Length: ", Font, TextColor, Layout, Format)
+            Graphics.DrawString("Total Length: ", Font, TextColor, Layout, Format)
             Layout.X = ResultPoint
             Graphics.DrawString(SegmentLength & " in.", Font, TextColor, Layout, Format)
         End If
@@ -375,7 +386,7 @@ Public Class Form1
         Dim CurrentDirectory = Directory.GetCurrentDirectory()
         Directory.SetCurrentDirectory(KnownFolders.Downloads.Path)
         Document.Save($"{PieceName}.pdf")
-        Dim PdfFile As New ProcessStartInfo("cmd", $"/r start {KnownFolders.Downloads.Path}\{PieceName}.pdf")
+        Dim PdfFile As New ProcessStartInfo("cmd", $"/r ""{KnownFolders.Downloads.Path}\{PieceName}.pdf""")
         PdfFile.CreateNoWindow = True
         Process.Start(PdfFile)
         Directory.SetCurrentDirectory(CurrentDirectory)
@@ -422,7 +433,7 @@ Public Class Form1
             sender.SelectionStart = 1
         End If
     End Sub
-    Private Sub Form_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBox1.KeyPress, TextBox2.KeyPress, TextBox3.KeyPress, TextBox4.KeyPress, TextBox5.KeyPress, TextBox6.KeyPress
+    Private Sub Form_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBox1.KeyPress, TextBox3.KeyPress, TextBox4.KeyPress, TextBox5.KeyPress, TextBox6.KeyPress
 
         '
         ' Listen for 'Enter' and begin calculation
@@ -432,11 +443,4 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub TextBox_MouseClick(sender As Object, e As MouseEventArgs) Handles TextBox1.MouseClick, TextBox2.MouseClick, TextBox3.MouseClick, TextBox4.MouseClick, TextBox5.MouseClick, TextBox6.MouseClick
-
-        '
-        ' Select all text when mouse clicks the text box or switched focus
-        '
-        CType(sender, TextBox).SelectAll()
-    End Sub
 End Class
